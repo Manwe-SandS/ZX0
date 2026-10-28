@@ -1,0 +1,64 @@
+; ZX0 v2.2 standard unpacker
+; Download compressor: https://github.com/einar-saukas/ZX0
+; PDP11 version by Manwe 02-may-2024, thanks to reddie
+; Unpacker size is 86 bytes
+; usage:
+; R1 = source data address (compressed)
+; R2 = address for decompressing data
+
+
+		MOV	#File,R1
+		MOV	#40000,R2
+		CALL	Unpack
+		WAIT
+		HALT
+
+
+Unpack:	MOV	#Copy+2,R3	; pointer to the offset in Copy
+;		MOV	+-1,(R3)		; for multiple runs
+		MOV	#200,R5		; bit stream buffer
+		MOV	#Elias,R0		; CALL (R0) is a word shorter than CALL @#Elias
+		CLC				; C = 0: ROLB of R5 must give 0
+
+Liter:	CALL	(R0)			; first block always contains length
+1:		MOVB	(R1)+,(R2)+
+		SOB	R4,1			; copy bytes from input file
+
+		ASLB	R5			; what kind of block is the next one?
+		BCS	NewOf
+Last:	CALL	(R0)			; decode length to copy from the last offset
+
+Copy:	MOVB	-1(R2),(R2)+	; Copy+2 is the offset
+		SOB	R4,Copy
+		ASLB	R5			; what kind of block is the next one?
+		BCC	Liter
+
+NewOf:	MOV	#376,R4		; -2 in the low byte; bit 15 = 0, else C pollutes ROLB
+		CLC
+		CALL	12(R0)		; decode high byte of offset (Elias+12 = label 2)
+		INCB	R4
+		BEQ	Exit
+		MOVB	(R1)+,(R3)+	; read and store low byte of offset
+		MOVB	R4,(R3)+		; store high byte of offset
+		ROR	-(R3)		; half offset: C = 1 is the sign, bit 0 goes to C
+		RORB	R5			; write the bit to the bit stream
+		CALL	(R0)			; decode length
+		INC	R4
+		BR	Copy
+
+Elias:	MOV	#1,R4
+		BR	2
+1:		ROLB	R5			; data bit
+		ROL	R4
+2:		ROLB	R5			; control bit: 0 - data bit follows, 1 - end of number
+		BCC	1
+		BNE	Exit
+		BISB	(R1)+,R5		; the marker was shifted out, read 8 bits
+		BR	2
+Exit:	RET
+
+
+File:	insert_file "packed-v2.zx0"
+		.EVEN
+
+	.END
