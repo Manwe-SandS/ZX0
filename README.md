@@ -2,7 +2,7 @@
 
 Small [ZX0](https://github.com/einar-saukas/ZX0) decompressors for the Elektronika BK-0010 (PDP-11), written in PDP-11 assembly.
 
-(c) Manwe/SandS, 2024
+Manwe/SandS, 2024
 https://manwe.pdp-11.ru
 
 PDP-11 version by Manwe, 02-may-2024, thanks to reddie.
@@ -26,4 +26,4 @@ The unpacker is a subroutine `Unpack`:
 
 Each source file is a complete example: it calls `Unpack` for a packed file included with `insert_file` and unpacks it to address 40000 (octal). It is written for [PDPy11](https://github.com/imachug/pdpy11) syntax.
 
-To run the unpacker several times, uncomment the `MOV +-1,(R3)` line at the start of `Unpack`, which resets the offset kept inside the code.
+To run the unpacker several times, uncomment the `MOV #-1,(R3)` line at the start of `Unpack`, which resets the offset kept inside the code.
