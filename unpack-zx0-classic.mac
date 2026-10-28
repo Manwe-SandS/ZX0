@@ -15,7 +15,7 @@
 
 
 Unpack:	MOV	#Copy+2,R3	; pointer to the offset in Copy
-;		MOV	+-1,(R3)		; for multiple runs
+;		MOV	#-1,(R3)		; for multiple runs
 		MOV	#200,R5		; bit stream buffer
 		MOV	#Elias,R0		; CALL (R0) is a word shorter than CALL @#Elias
 
