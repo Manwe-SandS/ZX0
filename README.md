@@ -27,3 +27,7 @@ The unpacker is a subroutine `Unpack`:
 Each source file is a complete example: it calls `Unpack` for a packed file included with `insert_file` and unpacks it to address 40000 (octal). It is written for [PDPy11](https://github.com/imachug/pdpy11) syntax.
 
 To run the unpacker several times, uncomment the `MOV #-1,(R3)` line at the start of `Unpack`, which resets the offset kept inside the code.
+
+## License
+
+[BSD 3-Clause](LICENSE), the same as the original ZX0.
